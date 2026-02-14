@@ -1,63 +1,157 @@
-<script>
-    const noBtn = document.getElementById('noBtn');
-    const mainContainer = document.getElementById('mainContainer');
-    const successDiv = document.getElementById('success');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A gift for you ✨</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #fce4ec;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            position: relative;
+        }
 
-    // 1. Falling Animation
-    function createPetal() {
-        const petal = document.createElement('div');
-        petal.classList.add('petal');
-        const items = ['🌸', '💖', '🌹', '✨'];
-        petal.innerHTML = items[Math.floor(Math.random() * items.length)];
-        petal.style.left = Math.random() * 100 + 'vw';
-        petal.style.animationDuration = Math.random() * 3 + 2 + 's';
-        document.body.appendChild(petal);
-        setTimeout(() => petal.remove(), 5000);
-    }
-    setInterval(createPetal, 300);
+        .petal {
+            position: absolute;
+            top: -50px;
+            font-size: 24px;
+            user-select: none;
+            pointer-events: none;
+            animation: fall linear forwards;
+            z-index: 1;
+        }
 
-    // 2. FIXED: Infinite Movement Logic
-    function moveButton() {
-        // Calculate the maximum safe width and height (window size minus button size)
-        const maxWidth = window.innerWidth - noBtn.offsetWidth - 20;
-        const maxHeight = window.innerHeight - noBtn.offsetHeight - 20;
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
 
-        // Generate random positions within the safe area
-        // We use Math.max(10, ...) to ensure it doesn't hit the very top/left edge
-        const newX = Math.max(10, Math.floor(Math.random() * maxWidth));
-        const newY = Math.max(10, Math.floor(Math.random() * maxHeight));
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 50px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
 
-        // Apply the new position
-        noBtn.style.position = 'fixed'; // Use fixed to stay relative to the screen
-        noBtn.style.left = `${newX}px`;
-        noBtn.style.top = `${newY}px`;
-    }
+        h1 { font-size: 2.5rem; color: #333; margin-bottom: 30px; }
 
-    // This makes it move when the mouse gets close OR when clicked
-    noBtn.addEventListener('mouseover', moveButton);
-    noBtn.addEventListener('touchstart', moveButton); // For mobile users
-    noBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        moveButton();
-    });
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+        }
 
-    // 3. Success & Data Tracking
-    function celebrate() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const detectedName = urlParams.get('who') || "Someone Anonymous";
-        const formspreeId = "mzdarbyn"; 
+        button {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.2s ease; /* Smooth growing effect */
+        }
 
-        fetch(`https://formspree.io/f/${formspreeId}`, {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                Valentine_Name: detectedName, 
-                Action: "Said YES! 💖", 
-                Time: new Date().toLocaleString() 
-            })
+        #yesBtn { background-color: #c2185b; color: white; }
+        #noBtn { 
+            background-color: #e0e0e0; 
+            color: #333; 
+            position: absolute; /* Changed to absolute for reliable jumping */
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainContainer">
+        <h1>Will you be my Valentine?</h1>
+        <div class="buttons">
+            <button id="yesBtn" onclick="celebrate()">YES 💖</button>
+            <button id="noBtn">NO 💔</button>
+        </div>
+        <p style="margin-top:20px; color:#777; font-style:italic;">Hint: The 'No' button is a bit shy... 😉</p>
+    </div>
+
+    <div id="success" class="container hidden">
+        <h1>Yay! I knew it! 🥰🌸</h1>
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueXpueXpueXpueXpueXpueXpueXpueXpueXpueXpueXpueCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KztT2c4u8mYYUiMKdJ/giphy.gif" alt="Happy Cat" width="280">
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const mainContainer = document.getElementById('mainContainer');
+        const successDiv = document.getElementById('success');
+
+        let yesSize = 1; // Current scale of Yes button
+
+        // 1. Falling Animation
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('petal');
+            const items = ['🌸', '💖', '🌹'];
+            petal.innerHTML = items[Math.floor(Math.random() * items.length)];
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.animationDuration = Math.random() * 3 + 2 + 's';
+            document.body.appendChild(petal);
+            setTimeout(() => petal.remove(), 5000);
+        }
+        setInterval(createPetal, 300);
+
+        // 2. FIXED: Jumping No Button + Growing Yes Button
+        function handleNo() {
+            // Move No Button
+            const padding = 50;
+            const maxWidth = window.innerWidth - noBtn.offsetWidth - padding;
+            const maxHeight = window.innerHeight - noBtn.offsetHeight - padding;
+
+            const newX = Math.max(padding, Math.floor(Math.random() * maxWidth));
+            const newY = Math.max(padding, Math.floor(Math.random() * maxHeight));
+
+            noBtn.style.left = `${newX}px`;
+            noBtn.style.top = `${newY}px`;
+
+            // Make Yes Button Grow
+            yesSize += 0.4; // Increase size by 40% each time
+            yesBtn.style.transform = `scale(${yesSize})`;
+        }
+
+        noBtn.addEventListener('mouseover', handleNo);
+        noBtn.addEventListener('click', handleNo);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            handleNo();
         });
 
-        mainContainer.classList.add('hidden');
-        successDiv.classList.remove('hidden');
-    }
-</script>
+        // 3. Final Success
+        function celebrate() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const detectedName = urlParams.get('who') || "Someone Anonymous";
+            const formspreeId = "mzdarbyn"; 
+
+            fetch(`https://formspree.io/f/${formspreeId}`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    Valentine_Name: detectedName, 
+                    Action: "Said YES! 💖", 
+                    Time: new Date().toLocaleString() 
+                })
+            });
+
+            mainContainer.classList.add('hidden');
+            successDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
