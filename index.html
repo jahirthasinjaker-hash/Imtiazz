@@ -1,171 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Will You Be My Valentine?</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #fce4ec;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            position: relative;
-        }
+// Change the celebrate function in your code to this:
 
-        /* Falling Animation Style */
-        .petal {
-            position: absolute;
-            top: -50px;
-            font-size: 24px;
-            user-select: none;
-            pointer-events: none;
-            animation: fall linear forwards;
-            z-index: 1;
-        }
+function celebrate() {
+    // 1. Auto-detect name from the URL link
+    const urlParams = new URLSearchParams(window.location.search);
+    const detectedName = urlParams.get('who') || "Someone Anonymous";
 
-        @keyframes fall {
-            to {
-                transform: translateY(110vh) rotate(360deg);
-            }
-        }
+    // 2. Send the data to Formspree
+    const formspreeId = "YOUR_FORMSPREE_ID"; // Put your ID here
+    
+    fetch(`https://formspree.io/f/${formspreeId}`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            Valentine_Name: detectedName,
+            Action: "Clicked YES! 💖",
+            Time: new Date().toLocaleString()
+        })
+    });
 
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.4);
-            padding: 40px;
-            border-radius: 30px;
-            backdrop-filter: blur(5px);
-            z-index: 10;
-        }
-
-        h1 {
-            font-size: 3rem;
-            color: #333;
-            margin-bottom: 30px;
-        }
-
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            align-items: center;
-        }
-
-        button {
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: transform 0.2s;
-            z-index: 20;
-        }
-
-        #yesBtn {
-            background-color: #c2185b;
-            color: white;
-        }
-
-        #noBtn {
-            background-color: #e0e0e0;
-            color: #333;
-            position: relative;
-        }
-
-        .hint {
-            margin-top: 20px;
-            color: #777;
-            font-style: italic;
-        }
-
-        .hidden { display: none; }
-        .success-msg {
-            font-size: 2.5rem;
-            color: #c2185b;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="container" id="mainContainer">
-        <h1 id="question">Will you be my Valentine?</h1>
-        <div class="buttons">
-            <button id="yesBtn" onclick="celebrate()">YES 💖</button>
-            <button id="noBtn">NO 💔</button>
-        </div>
-        <p class="hint">Hint: The 'No' button is a bit shy... 😉</p>
-    </div>
-
-    <div id="success" class="container hidden">
-        <h1 class="success-msg">Yay! See you then! 🥰🌸</h1>
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueXpueXpueXpueXpueXpueXpueXpueXpueXpueXpueXpueCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KztT2c4u8mYYUiMKdJ/giphy.gif" alt="Happy Cat" width="300">
-    </div>
-
-    <script>
-        const noBtn = document.getElementById('noBtn');
-        const mainContainer = document.getElementById('mainContainer');
-        const successDiv = document.getElementById('success');
-
-        // 1. Falling Flower Animation
-        function createPetal() {
-            const petal = document.createElement('div');
-            petal.classList.add('petal');
-            // Randomly choose between a flower or a heart
-            const items = ['🌸', '💖', '✨', '🌹'];
-            petal.innerHTML = items[Math.floor(Math.random() * items.length)];
-            
-            petal.style.left = Math.random() * 100 + 'vw';
-            petal.style.animationDuration = Math.random() * 3 + 2 + 's'; // Between 2-5s
-            petal.style.opacity = Math.random();
-            petal.style.fontSize = Math.random() * 10 + 20 + 'px';
-            
-            document.body.appendChild(petal);
-            
-            // Remove from memory after it falls
-            setTimeout(() => {
-                petal.remove();
-            }, 5000);
-        }
-
-        // Create a new petal every 300ms
-        setInterval(createPetal, 300);
-
-        // 2. Shy "No" Button Logic
-        function moveButton() {
-            const vWidth = window.innerWidth;
-            const vHeight = window.innerHeight;
-
-            const newX = Math.random() * (vWidth - noBtn.offsetWidth);
-            const newY = Math.random() * (vHeight - noBtn.offsetHeight);
-
-            noBtn.style.position = 'absolute';
-            noBtn.style.left = `${newX}px`;
-            noBtn.style.top = `${newY}px`;
-        }
-
-        noBtn.addEventListener('mouseover', moveButton);
-        noBtn.addEventListener('click', moveButton);
-
-        // 3. "Yes" Button Action
-        function celebrate() {
-            // Replace with your Formspree ID to get emails!
-            const formspreeId = "YOUR_ID_HERE"; 
-            
-            fetch(`https://formspree.io/f/${formspreeId}`, {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: "They said YES! 💖" })
-            });
-
-            mainContainer.classList.add('hidden');
-            successDiv.classList.remove('hidden');
-        }
-    </script>
-</body>
-</html>
+    // Show success screen
+    mainContainer.classList.add('hidden');
+    successDiv.classList.remove('hidden');
+}
