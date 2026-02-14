@@ -6,7 +6,7 @@ function celebrate() {
     const detectedName = urlParams.get('who') || "Someone Anonymous";
 
     // 2. Send the data to Formspree
-    const formspreeId = "YOUR_FORMSPREE_ID"; // Put your ID here
+    const formspreeId = "mzdarbyn"; // Put your ID here
     
     fetch(`https://formspree.io/f/${formspreeId}`, {
         method: "POST",
@@ -22,3 +22,4 @@ function celebrate() {
     mainContainer.classList.add('hidden');
     successDiv.classList.remove('hidden');
 }
+
