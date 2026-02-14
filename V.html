@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will You Be My Valentine?</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #fce4ec;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #yesBtn {
+            background-color: #c2185b;
+            color: white;
+        }
+
+        #noBtn {
+            background-color: #e0e0e0;
+            color: #333;
+            position: relative;
+        }
+
+        .hint {
+            margin-top: 20px;
+            color: #777;
+            font-style: italic;
+        }
+
+        .hidden { display: none; }
+        .success-msg {
+            font-size: 2.5rem;
+            color: #c2185b;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainContainer">
+        <h1 id="question">Will you be my Valentine?</h1>
+        <div class="buttons">
+            <button id="yesBtn" onclick="celebrate()">YES 💖</button>
+            <button id="noBtn">NO 💔</button>
+        </div>
+        <p class="hint">Hint: The 'No' button is a bit shy... 😉</p>
+    </div>
+
+    <div id="success" class="container hidden">
+        <h1 class="success-msg">Yay! See you then! 🥰🌸</h1>
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpueXpueXpueXpueXpueXpueXpueXpueXpueXpueXpueXpueCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KztT2c4u8mYYUiMKdJ/giphy.gif" alt="Happy Cat" width="300">
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const mainContainer = document.getElementById('mainContainer');
+        const successDiv = document.getElementById('success');
+
+        function moveButton() {
+            const vWidth = window.innerWidth;
+            const vHeight = window.innerHeight;
+
+            const newX = Math.random() * (vWidth - noBtn.offsetWidth);
+            const newY = Math.random() * (vHeight - noBtn.offsetHeight);
+
+            noBtn.style.position = 'absolute';
+            noBtn.style.left = `${newX}px`;
+            noBtn.style.top = `${newY}px`;
+        }
+
+        noBtn.addEventListener('mouseover', moveButton);
+        noBtn.addEventListener('click', moveButton);
+
+        function celebrate() {
+            // --- NOTIFICATION LOGIC ---
+            // Replace the ID below with your Formspree ID
+            const formspreeId = "INSERT_YOUR_FORMSPREE_ID_HERE"; 
+            
+            fetch(`https://formspree.io/f/${formspreeId}`, {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    subject: "Valentine Update!",
+                    message: "Someone just clicked YES! 💖" 
+                })
+            });
+
+            // Show success screen immediately
+            mainContainer.classList.add('hidden');
+            successDiv.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
