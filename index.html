@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Will You Be My Valentine?</title>
+    
+    <title>A gift for you ✨</title>
+
     <style>
         body {
             display: flex;
@@ -17,7 +19,7 @@
             position: relative;
         }
 
-        /* Falling Decorations */
+        /* Falling Heart/Flower Animation */
         .petal {
             position: absolute;
             top: -50px;
@@ -40,7 +42,6 @@
             backdrop-filter: blur(10px);
             z-index: 10;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            max-width: 90%;
         }
 
         h1 { font-size: 2.5rem; color: #333; margin-bottom: 30px; }
@@ -60,7 +61,6 @@
             border-radius: 50px;
             cursor: pointer;
             z-index: 20;
-            transition: transform 0.1s;
         }
 
         #yesBtn { background-color: #c2185b; color: white; }
@@ -78,6 +78,7 @@
             <button id="yesBtn" onclick="celebrate()">YES 💖</button>
             <button id="noBtn">NO 💔</button>
         </div>
+        <p style="margin-top:20px; color:#777; font-style:italic;">Hint: The 'No' button is a bit shy... 😉</p>
     </div>
 
     <div id="success" class="container hidden">
@@ -90,11 +91,11 @@
         const mainContainer = document.getElementById('mainContainer');
         const successDiv = document.getElementById('success');
 
-        // Falling Flowers & Hearts
+        // Animation logic
         function createPetal() {
             const petal = document.createElement('div');
             petal.classList.add('petal');
-            const items = ['🌸', '💖', '🌹', '✨'];
+            const items = ['🌸', '💖', '🌹'];
             petal.innerHTML = items[Math.floor(Math.random() * items.length)];
             petal.style.left = Math.random() * 100 + 'vw';
             petal.style.animationDuration = Math.random() * 3 + 2 + 's';
@@ -103,7 +104,7 @@
         }
         setInterval(createPetal, 300);
 
-        // Movement for 'No' button
+        // Movement logic for 'No' button
         function moveButton() {
             const vWidth = window.innerWidth;
             const vHeight = window.innerHeight;
@@ -116,7 +117,7 @@
         noBtn.addEventListener('mouseover', moveButton);
         noBtn.addEventListener('click', moveButton);
 
-        // Your specific storage function
+        // Tracking and success logic
         function celebrate() {
             const urlParams = new URLSearchParams(window.location.search);
             const detectedName = urlParams.get('who') || "Someone Anonymous";
@@ -127,7 +128,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     Valentine_Name: detectedName, 
-                    Action: "Clicked YES! 💖", 
+                    Action: "Said YES!", 
                     Time: new Date().toLocaleString() 
                 })
             });
